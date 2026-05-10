@@ -1,0 +1,12 @@
+# Model and data
+app/model.pkl
+app/src/__pycache__/
+__pycache__/
+*.pyc
+
+# AWS
+.aws/
+
+# Environment
+.env
+venv/
