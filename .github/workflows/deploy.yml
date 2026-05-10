@@ -7,10 +7,9 @@ on:
 env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: heart-disease-api
-  EKS_CLUSTER: heart-disease-cluster
 
 jobs:
-  build-and-deploy:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
@@ -32,14 +31,3 @@ jobs:
       run: |
         docker build -t ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }} .
         docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
-
-    - name: Update kubeconfig
-      run: |
-        aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER }}
-
-    - name: Deploy to EKS
-      run: |
-        kubectl set image deployment/heart-disease-api \
-          heart-disease-api=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
-        kubectl apply -f k8s/
-        kubectl rollout status deployment/heart-disease-api
